@@ -494,3 +494,34 @@ Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'no such col
    at BlazorLoggingDemo.Repository.SqliteLogRepository.GetRecentLogsAsync(Int32 count) in D:\CSharpProjektai\BlazorLoggingDemo\Repository\SqliteLogRepository.cs:line 37
    at BlazorLoggingDemo.Pages.LogViewer.LoadLogs() in D:\CSharpProjektai\BlazorLoggingDemo\Pages\LogViewer.razor:line 116
 2025-03-19 20:06:51.131 +02:00 [INF] Log viewer initialized
+2025-03-19 20:07:43.063 +02:00 [INF] Log viewer initialized
+2025-03-19 20:10:48.961 +02:00 [ERR] User logged in - Random ID: 9408
+2025-03-19 20:10:48.967 +02:00 [ERR] Database operation completed - Random ID: 2852
+System.InvalidOperationException: This is a test exception
+   at BlazorLoggingDemo.Pages.LogDemo.GenerateLog()
+2025-03-19 20:10:48.973 +02:00 [FTL] Database operation completed - Random ID: 7790
+2025-03-19 20:10:48.976 +02:00 [ERR] API request failed - Random ID: 2120
+2025-03-19 20:10:48.980 +02:00 [ERR] Cache miss - Random ID: 4109
+System.InvalidOperationException: This is a test exception
+   at BlazorLoggingDemo.Pages.LogDemo.GenerateLog()
+2025-03-19 20:10:52.390 +02:00 [ERR] Cache miss - Random ID: 4109
+System.InvalidOperationException: This is a test exception
+   at BlazorLoggingDemo.Pages.LogDemo.GenerateLog()
+2025-03-19 20:10:53.992 +02:00 [ERR] Payment processed - Random ID: 5394
+2025-03-19 20:10:54.001 +02:00 [FTL] Email notification sent - Random ID: 7159
+System.InvalidOperationException: This is a test exception
+   at BlazorLoggingDemo.Pages.LogDemo.GenerateLog()
+2025-03-19 20:10:54.012 +02:00 [ERR] Cache miss - Random ID: 6722
+2025-03-19 20:10:54.017 +02:00 [INF] API request failed - Random ID: 7314
+System.InvalidOperationException: This is a test exception
+   at BlazorLoggingDemo.Pages.LogDemo.GenerateLog()
+2025-03-19 20:10:54.021 +02:00 [FTL] API request failed - Random ID: 3034
+2025-03-19 20:10:56.877 +02:00 [FTL] API request failed - Random ID: 3034
+2025-03-19 20:11:00.158 +02:00 [INF] Log viewer initialized
+2025-03-19 20:11:26.130 +02:00 [INF] Log viewer initialized
+2025-03-19 20:13:26.062 +02:00 [INF] Log viewer initialized
+2025-03-19 20:13:31.677 +02:00 [INF] Log viewer initialized
+2025-03-19 20:13:34.834 +02:00 [INF] Log viewer initialized
+2025-03-19 20:13:36.730 +02:00 [INF] Log viewer initialized
+2025-03-19 20:13:40.625 +02:00 [INF] Log viewer initialized
+2025-03-19 20:13:43.373 +02:00 [INF] Log viewer initialized
