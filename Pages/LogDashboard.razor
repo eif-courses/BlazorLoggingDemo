@@ -1,0 +1,79 @@
+﻿@page "/log-dashboard"
+@using BlazorLoggingDemo.Repository
+@inject ILogRepository LogRepository
+
+<h1>Log Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Logs</h5>
+                <p class="card-text display-4">@_totalLogs</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">Log Level Distribution</div>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height:200px;">
+                    <canvas id="logLevelChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">Recent Logs</div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Level</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in _recentLogs)
+                        {
+                            <tr>
+                                <td>@log.Timestamp.ToString("HH:mm:ss")</td>
+                                <td>
+                                    <span class="badge @GetBadgeClass(log.Level)">
+                                        @log.Level
+                                    </span>
+                                </td>
+                                <td>@log.Message?.Substring(0, Math.Min(log.Message.Length, 100))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int _totalLogs;
+    private IEnumerable<LogEntry> _recentLogs = Enumerable.Empty<LogEntry>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _totalLogs = await LogRepository.GetLogCountAsync();
+        _recentLogs = await LogRepository.GetRecentLogsAsync(10);
+    }
+    
+    private string GetBadgeClass(string level) => level switch
+    {
+        "Error" or "Fatal" => "bg-danger",
+        "Warning" => "bg-warning",
+        "Information" => "bg-info",
+        _ => "bg-secondary"
+    };
+}

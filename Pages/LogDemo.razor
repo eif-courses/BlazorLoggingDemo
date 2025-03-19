@@ -1,0 +1,136 @@
+﻿@page "/log-demo"
+@inject ILogger<LogDemo> Logger
+
+<h1>Log Generator Demo</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Generate Test Logs</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Log Level</label>
+                    <select class="form-select" @bind="SelectedLevel">
+                        <option value="Information">Information</option>
+                        <option value="Warning">Warning</option>
+                        <option value="Error">Error</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Message</label>
+                    <input type="text" class="form-control" @bind="LogMessage" />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-check">
+                        <input type="checkbox" class="form-check-input" @bind="IncludeException" />
+                        <span class="form-check-label">Include Exception</span>
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary" @onclick="GenerateLog">Generate Log</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Generate Many Logs</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Number of Logs</label>
+                    <input type="number" class="form-control" @bind="LogCount" min="1" max="100" />
+                </div>
+                
+                <button class="btn btn-warning" @onclick="GenerateMultipleLogs">
+                    Generate @LogCount Random Logs
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string SelectedLevel { get; set; } = "Information";
+    private string LogMessage { get; set; } = "This is a test log message";
+    private bool IncludeException { get; set; } = false;
+    private int LogCount { get; set; } = 10;
+    
+    private void GenerateLog()
+    {
+        if (IncludeException)
+        {
+            try
+            {
+                throw new InvalidOperationException("This is a test exception");
+            }
+            catch (Exception ex)
+            {
+                switch (SelectedLevel)
+                {
+                    case "Information":
+                        Logger.LogInformation(ex, LogMessage);
+                        break;
+                    case "Warning":
+                        Logger.LogWarning(ex, LogMessage);
+                        break;
+                    case "Error":
+                        Logger.LogError(ex, LogMessage);
+                        break;
+                    case "Critical":
+                        Logger.LogCritical(ex, LogMessage);
+                        break;
+                }
+            }
+        }
+        else
+        {
+            switch (SelectedLevel)
+            {
+                case "Information":
+                    Logger.LogInformation(LogMessage);
+                    break;
+                case "Warning":
+                    Logger.LogWarning(LogMessage);
+                    break;
+                case "Error":
+                    Logger.LogError(LogMessage);
+                    break;
+                case "Critical":
+                    Logger.LogCritical(LogMessage);
+                    break;
+            }
+        }
+    }
+    
+    private void GenerateMultipleLogs()
+    {
+        var random = new Random();
+        var levels = new[] { "Information", "Warning", "Error", "Critical" };
+        var messages = new[] 
+        { 
+            "User logged in", 
+            "Database operation completed", 
+            "API request failed", 
+            "Payment processed", 
+            "File upload started", 
+            "Cache miss", 
+            "Email notification sent"
+        };
+        
+        for (int i = 0; i < LogCount; i++)
+        {
+            var level = levels[random.Next(levels.Length)];
+            var message = messages[random.Next(messages.Length)];
+            var withException = random.Next(10) < 3; // 30% chance of exception
+            
+            SelectedLevel = level;
+            LogMessage = $"{message} - Random ID: {random.Next(1000, 9999)}";
+            IncludeException = withException;
+            
+            GenerateLog();
+        }
+    }
+}

@@ -1,0 +1,155 @@
+﻿@page "/logs"
+@using BlazorLoggingDemo.Repository
+
+@inject ILogRepository LogRepository
+@inject ILogger<LogViewer> Logger
+
+<h1>Application Logs</h1>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="input-group">
+            <span class="input-group-text">Log Level</span>
+            <select class="form-select" @bind="SelectedLevel">
+                <option value="">All Levels</option>
+                <option value="Information">Information</option>
+                <option value="Warning">Warning</option>
+                <option value="Error">Error</option>
+                <option value="Fatal">Fatal</option>
+            </select>
+            
+            <span class="input-group-text">Date Range</span>
+            <input type="date" class="form-control" @bind="StartDate" />
+            <input type="date" class="form-control" @bind="EndDate" />
+            
+            <button class="btn btn-primary" @onclick="FilterLogs">Apply Filter</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Total Logs: @(_totalLogs)</span>
+        <button class="btn btn-sm btn-secondary" @onclick="RefreshLogs">Refresh</button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Level</th>
+                        <th>Message</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (_logs == null)
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">Loading...</td>
+                        </tr>
+                    }
+                    else if (!_logs.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">No logs found</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var log in _logs)
+                        {
+                            <tr class="@GetRowClass(log.Level)">
+                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@log.Level</td>
+                                <td>@log.Message</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(log.Exception))
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                @onclick="() => ToggleDetails(log.Id)">
+                                            @(ExpandedLogId == log.Id ? "Hide" : "Show")
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                            @if (ExpandedLogId == log.Id && !string.IsNullOrEmpty(log.Exception))
+                            {
+                                <tr>
+                                    <td colspan="4" class="bg-light">
+                                        <pre class="mb-0">@log.Exception</pre>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<LogEntry> _logs;
+    private int _totalLogs;
+    private int? ExpandedLogId;
+    
+    private string SelectedLevel { get; set; } = "";
+    private DateTime StartDate { get; set; } = DateTime.Today.AddDays(-7);
+    private DateTime EndDate { get; set; } = DateTime.Today.AddDays(1);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("Log viewer initialized");
+        await LoadLogs();
+    }
+    
+    private async Task LoadLogs()
+    {
+        try
+        {
+            _totalLogs = await LogRepository.GetLogCountAsync();
+            
+            if (string.IsNullOrEmpty(SelectedLevel))
+            {
+                _logs = await LogRepository.GetRecentLogsAsync(100);
+            }
+            else
+            {
+                _logs = await LogRepository.GetLogsByLevelAsync(SelectedLevel, StartDate, EndDate);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading logs");
+            _logs = Enumerable.Empty<LogEntry>();
+        }
+    }
+    
+    private async Task FilterLogs()
+    {
+        await LoadLogs();
+    }
+    
+    private async Task RefreshLogs()
+    {
+        await LoadLogs();
+    }
+    
+    private void ToggleDetails(int id)
+    {
+        if (ExpandedLogId == id)
+            ExpandedLogId = null;
+        else
+            ExpandedLogId = id;
+    }
+    
+    private string GetRowClass(string level) => level switch
+    {
+        "Error" or "Fatal" => "table-danger",
+        "Warning" => "table-warning",
+        "Information" => "table-info",
+        _ => ""
+    };
+}
